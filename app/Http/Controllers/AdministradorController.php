@@ -774,12 +774,6 @@ class AdministradorController extends Controller
         $request->flash();
         $data = $request->all();
 
-        $programas = Programa::all();
-        $municipios = Municipio::all();
-        $centros = Centro::all();
-        $trimestres = Trimestre::all();
-        // $competencias = Competencia_Laboral::all();
-
         $ofertas_programas = Oferta_Programa::select('ofertas_programas.*')
         ->join('programas_centros', 'ofertas_programas.programas_centros_id','programas_centros.id')
         ->join('programas', 'programas_centros.programas_id','programas.id');
@@ -820,6 +814,19 @@ class AdministradorController extends Controller
         //     $ofertas_competencias->where('competencias_laborales_centros_id', Auth::user()->centros_id );
         // }
         // $ofertas_competencias= $ofertas_competencias->paginate(10)->appends(request()->all());
+
+        if ($request->ajax()) {
+            // Si la búsqueda es una oferta de programas de formación
+            if ($data["type"] == 0) {
+                return view('Administrador.Gestion_Ofertas.programas.tabla', compact('ofertas_programas'));
+            }
+        }
+
+        $programas = Programa::all();
+        $municipios = Municipio::all();
+        $centros = Centro::all();
+        $trimestres = Trimestre::all();
+        // $competencias = Competencia_Laboral::all();
 
         return view('Administrador.Gestion_Ofertas.programas.index', compact('programas', /*'competencias',*/ 'municipios',  'centros', 'trimestres', 'ofertas_programas'/*, 'ofertas_competencias'*/));
     }

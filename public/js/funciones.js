@@ -916,7 +916,7 @@ function editarPrograma() {
 function filtrarOfertaProgramas() {
     event.preventDefault();
     let url = `${SERVER_URL}admon/gestion_ofertas`;
-    let datos = $('#form_filtrar_oferta_programas').serialize();
+    let datos = $('#contenedor_oferta_programa  #form_filtrar').serialize();
 
     $.ajax({
         url,
@@ -924,7 +924,7 @@ function filtrarOfertaProgramas() {
         data: datos,
         datatype: "json"
     }).done(function (msg) {
-        $("body").html(msg);
+        $('#contenedor_oferta_programa  #tabla').html(msg);
     }).fail(function (jqXHR, textStatus) {
         console.log(jqXHR)
         console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);

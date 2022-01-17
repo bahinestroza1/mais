@@ -57,7 +57,7 @@ active
                     <i class="fas fa-minus" style="color: #FFF;"></i></button>
             </div>
         </div>
-        <div class="card-body">
+        <div id="contenedor_oferta_programa" class="card-body">
             <div class="card">
                 <div class="card-header bg-primary">
                     <h3 class="card-title">{{tiene_rol(1) ? 'Oferta: REGIONAL VALLE' : Auth::user()->centro->nombre }}</h3>
@@ -69,8 +69,9 @@ active
                 </div>
                 <div class="card-body">
                     <div class="container-fluid">
-                        <form id="form_filtrar_oferta_programas" onsubmit="filtrarOfertaProgramas(event)" autocomplete="off">
+                        <form id="form_filtrar" onsubmit="filtrarOfertaProgramas(event)" autocomplete="off">
                             @csrf
+                            <input type="hidden" id="type" name="type" value="0">
                             <div class="row">
                                 @if(tiene_rol(1))                                
                                     <div class="col-md-3">
@@ -167,7 +168,7 @@ active
                 </div>
             </div>   
             @if(isset($ofertas_programas))
-                <div id="tabla_ofertas_programas">
+                <div id="tabla">
                     @include('Administrador.Gestion_Ofertas.programas.tabla')
                 </div>
             @endif
