@@ -1333,7 +1333,42 @@ function cargarModalVerOfertaPrograma(idOfertaPrograma) {
 function filtrarSolicitudes() {
     event.preventDefault();
     let url = `${SERVER_URL}servicios/solicitudes`;
-    let datos = $('#form_filtrar_solicitudes').serialize();
+    let datos = $('#form_filtrar').serialize();
+
+    const fecha_inicio = $('#filtro_fecha_inicio').val();
+    const fecha_fin = $('#filtro_fecha_fin').val();
+
+    if (fecha_inicio != "") {
+        if (fecha_fin == "") {
+            swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Por favor, ingrese la fecha fin de solicitud.',
+                confirmButtonText: 'Aceptar',
+            });
+            return;
+        }
+
+        if (fecha_fin < fecha_inicio) {
+            swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'La fecha de inicio no puede ser mayor a la de fin.',
+                confirmButtonText: 'Aceptar',
+            });
+            return;
+        }
+    } else {
+        if (fecha_fin != "") {
+            swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Por favor, ingrese la fecha de inicio de solicitud.',
+                confirmButtonText: 'Aceptar',
+            });
+            return;
+        }
+    }
 
     $.ajax({
         url,
@@ -1341,7 +1376,7 @@ function filtrarSolicitudes() {
         data: datos,
         datatype: "json"
     }).done(function (msg) {
-        $("body").html(msg);
+        $("#tabla").html(msg);
     }).fail(function (jqXHR, textStatus) {
         console.log(jqXHR)
         console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);

@@ -102,8 +102,7 @@ class ServiciosController extends Controller
     {
         $request->flash();
         $data = $request->all();
-        $solicitudes = Solicitud::select('*');
-        $servicios = Servicio::all();
+        $solicitudes = Solicitud::select('*');        
 
         if(isset($data['filtro_servicio']) && $data['filtro_servicio'] != "null"){
             $solicitudes->where('servicios_id', $data['filtro_servicio']);
@@ -111,6 +110,10 @@ class ServiciosController extends Controller
         
         if(isset($data['filtro_estado']) && $data['filtro_estado'] != "null"){
             $solicitudes->where('estado', $data['filtro_estado']);
+        }
+        
+        if(isset($data['filtro_fecha_inicio']) && isset($data['filtro_fecha_fin'])){
+            $solicitudes->whereBetween('fecha_solicitud', [$data['filtro_fecha_inicio'],$data['filtro_fecha_fin']]);
         }
 
         if (tiene_rol(4,2)) {
@@ -128,8 +131,13 @@ class ServiciosController extends Controller
             return view('Servicios.solicitudes.index', compact('solicitudes', 'servicios', 'ofertas_centros'));
         }
 
-        $solicitudes = $solicitudes->paginate(10)->appends(request()->all());
+        $solicitudes = $solicitudes->paginate(3)->appends(request()->all());
 
+        if ($request->ajax()) {
+            return view('Servicios.solicitudes.tabla', compact('solicitudes'));
+        }
+
+        $servicios = Servicio::all();
         return view('Servicios.solicitudes.index', compact('solicitudes', 'servicios'));
     }
 

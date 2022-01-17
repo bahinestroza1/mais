@@ -45,7 +45,7 @@ active
         </div>
         <div class="card-body">      
             <div class="container-fluid">      
-                <form id="form_filtrar_solicitudes" onsubmit="filtrarSolicitudes()" autocomplete="off">
+                <form id="form_filtrar" onsubmit="filtrarSolicitudes()" autocomplete="off">
                     @csrf
                     <div class="row">                      
                         <div class="col-md-3">
@@ -57,7 +57,18 @@ active
                                 @endforeach
                             </select>
                         </div>
+
                         <div class="col-md-2">
+                            <label for="filtro_fecha_inicio">Fecha inicio de solicitud</label>
+                            <input type="date" name="filtro_fecha_inicio" id="filtro_fecha_inicio" class="form-control" value="{{ old('filtro_fecha_inicio') }}">
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="filtro_fecha_fin">Fecha fin de solicitud</label>
+                            <input type="date" name="filtro_fecha_fin" id="filtro_fecha_fin" class="form-control" value="{{ old('filtro_fecha_fin') }}">
+                        </div>
+
+                        <div class="col-md-3">
                             <label for="filtro_estado">Estado</label>
                             <select id="filtro_estado" name="filtro_estado" class="form-control"  >
                                 <option selected value="null">TODOS</option>
@@ -86,7 +97,7 @@ active
         </div>
     </div>
     @if(isset($solicitudes))
-        <div id="tabla_oferta_programa">
+        <div id="tabla">
             @include('Servicios.solicitudes.tabla')
         </div>
     @endif
