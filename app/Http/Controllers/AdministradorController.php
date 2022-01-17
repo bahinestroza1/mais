@@ -515,11 +515,15 @@ class AdministradorController extends Controller
 
         $request->flash();
         
-        $data = $request->all();
-        $tipo_documentos = TipoDocumento::all();
-        $roles = Rol::all();
-        $centros = Centro::all()->sortBy('nombre');
+        $data = $request->all();        
         $funcionarios = Funcionario::select('*');
+
+        if(isset($data['filtro_nombre'])){
+            $funcionarios->where(function ($query) use ($data) {
+                $query->where('nombre', "like", "%".$data['filtro_nombre']."%") 
+                ->orWhere('apellido', "like", "%".$data['filtro_nombre']."%");
+            });
+        }
 
         if(isset($data['filtro_tipo'])){
             $funcionarios->where('tipos_documentos_id', $data['filtro_tipo']);
@@ -529,10 +533,6 @@ class AdministradorController extends Controller
             $funcionarios->where('documento', $data['filtro_documento']);
         }
         
-        if(isset($data['filtro_nombre'])){
-            $funcionarios->where(DB::raw("CONCAT('nombre',' ','apellido')"), "like", '%'.$data['filtro_nombre']."%");
-        }
-
         if(isset($data['filtro_estado'])){
             $funcionarios->where('estado', $data['filtro_estado']);
         }else{
@@ -540,7 +540,7 @@ class AdministradorController extends Controller
         }
 
         if (!tiene_rol(1)) {
-            $funcionarios = $funcionarios->where('centros_id', Auth::user()->centros_id );
+            $funcionarios->where('centros_id', Auth::user()->centros_id );
         }else{
             if(isset($data['filtro_centro'])){
                 $funcionarios->where('centros_id', $data['filtro_centro']);
@@ -551,7 +551,15 @@ class AdministradorController extends Controller
             $funcionarios->where('roles_id', $data['filtro_rol']);
         }
 
-        $funcionarios = $funcionarios->paginate(10)->appends(request()->all());
+        $funcionarios = $funcionarios->paginate(3)->appends(request()->all());
+
+        if ($request->ajax()) {
+            return view('Administrador.Gestion_Funcionarios.tabla', compact('funcionarios'));
+        }
+
+        $tipo_documentos = TipoDocumento::all();
+        $roles = Rol::all();
+        $centros = Centro::all()->sortBy('nombre');
 
         return view('Administrador.Gestion_Funcionarios.index', compact('funcionarios', 'tipo_documentos', 'roles', 'centros'));
     }

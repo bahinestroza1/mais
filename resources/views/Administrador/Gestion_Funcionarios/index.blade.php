@@ -58,7 +58,7 @@ active
                         </div>
 
                         <div class="card-body">
-                            <form id="form_filtrar_funcionarios" onsubmit="filtrarFuncionarios()" autocomplete="off">
+                            <form id="form_filtrar" onsubmit="filtrarFuncionarios()" autocomplete="off">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-3">
@@ -72,7 +72,7 @@ active
                                     
                                     <div class="col-md-3">
                                         <label for="filtro_documento">Número de documento</label>
-                                        <input type="text" id="filtro_documento" name="filtro_documento" class="form-control" value="{{ old('filtro_documento') }}">
+                                        <input type="number" id="filtro_documento" name="filtro_documento" class="form-control" value="{{ old('filtro_documento') }}">
                                     </div>
                                     
                                     <div class="col-md-3">
@@ -119,7 +119,7 @@ active
                     </div>
                     
                     @if(isset($funcionarios))
-                        <div id="tabla_funcionarios">
+                        <div id="tabla">
                             @include('Administrador.Gestion_Funcionarios.tabla')
                         </div>
                     @endif

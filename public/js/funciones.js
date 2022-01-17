@@ -411,7 +411,7 @@ function closeModalCargaMasivaUsuarios() {
 function filtrarFuncionarios() {
     event.preventDefault();
     let url = `${SERVER_URL}admon/gestion_funcionarios`;
-    let datos = $('#form_filtrar_funcionarios').serialize();
+    let datos = $('#form_filtrar').serialize();
 
     const documentoFuncionario = $('#filtro_documento').val();
 
@@ -431,8 +431,9 @@ function filtrarFuncionarios() {
         data: datos,
         datatype: "json"
     }).done(function (msg) {
-        $("body").html(msg);
+        $("#tabla").html(msg);
     }).fail(function (jqXHR, textStatus) {
+        console.log(jqXHR)
         console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);
     });
 }
