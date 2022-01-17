@@ -1,5 +1,13 @@
 const SERVER_URL = 'http://localhost/proyectos/Appmunicipios/public/'
 
+$('.pagination a').on('click', function (e) {
+    e.preventDefault();
+    const url = $(this).attr('href');
+
+    $.get(url, $('#form_filtrar').serialize(), function (data) {
+        $('#tabla').html(data);
+    });
+});
 
 function change_custom_file(input, idLabel) {
     $(idLabel).html(input.files[0].name);
@@ -36,23 +44,26 @@ function filtrarMunicipio(event) {
     }
 
     let url = `${SERVER_URL}admon/gestion_municipios`;
-    let datos = $('#form_filtrar_municipios').serialize();
+    let datos = $('#form_filtrar').serialize();
 
     $.ajax({
         url,
         method: "GET",
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+        xhrFields: { withCredentials: true },
         data: datos,
         datatype: "json"
     }).done(function (msg) {
-        $('body').html(msg);
+        $('#tabla').html(msg);
     }).fail(function (jqXHR, textStatus) {
+        console.log(jqXHR)
         swal.fire({
             icon: 'error',
             title: 'Error!',
             text: textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText,
             confirmButtonText: 'Aceptar',
         });
+
         console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);
     });
 }

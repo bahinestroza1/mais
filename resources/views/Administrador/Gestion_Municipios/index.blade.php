@@ -46,17 +46,17 @@ active
                 </div>
 
                 <div class="card-body">
-                    <form id="form_filtrar_municipios" onsubmit="filtrarMunicipio(event)" autocomplete="off">
+                    <form id="form_filtrar" onsubmit="filtrarMunicipio(event)" autocomplete="off">
                         @csrf
                         <div class="row">
                             <div class="col-md-4">
                                 <label for="filtro_codigo">Código de Municipio</label>
-                                <input type="text" id="filtro_codigo" name="filtro_codigo" class="form-control">
+                                <input type="number" id="filtro_codigo" name="filtro_codigo" class="form-control" value="{{ old('filtro_codigo') }}" >
                             </div>
                             
                             <div class="col-md-4">
                                 <label for="filtro_nombre">Nombre de Municipio</label>
-                                <input type="text" id="filtro_nombre" name="filtro_nombre" class="form-control">
+                                <input type="text" id="filtro_nombre" name="filtro_nombre" class="form-control" value="{{ old('filtro_nombre') }}" >
                             </div>
                             
                             <div class="mt-2 col-md-2 d-flex align-items-end">
@@ -68,7 +68,7 @@ active
             </div>
             
             @if(isset($data))
-                <div id="tabla_municipios">
+                <div id="tabla">
                     @include('Administrador.Gestion_Municipios.tabla')
                 </div>
             @endif

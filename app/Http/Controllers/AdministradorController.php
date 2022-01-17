@@ -37,6 +37,8 @@ class AdministradorController extends Controller
     public function gestion_municipios(Request $request)
     {
         acceso_a(1,2);
+        $request->flash();
+        
         $datos = $request->all();
         $data = Municipio::select('*');
 
@@ -48,7 +50,11 @@ class AdministradorController extends Controller
             $data->where('nombre', 'like', '%' . $datos['filtro_nombre'] . '%');
         }
         
-        $data= $data->paginate(10)->appends(request()->all());
+        $data = $data->paginate(10)->appends(request()->all())->withPath(url('/admon/gestion_municipios'));
+
+        if ($request->ajax()) {
+            return view('Administrador.Gestion_Municipios.tabla', compact('data'));
+        }
 
         return view('Administrador.Gestion_Municipios.index', compact('data'));
     }
