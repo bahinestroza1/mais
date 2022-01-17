@@ -31,11 +31,6 @@ class ServiciosController extends Controller
         $request->flash();
         $data = $request->all();
 
-        $programas = Programa::all();
-        $municipios = Municipio::all();
-        $centros = Centro::all();
-        $trimestres = Trimestre::all();
-
         $ofertas_programas = Oferta_Programa::select('ofertas_programas.*')
         ->join('programas_centros', 'ofertas_programas.programas_centros_id','programas_centros.id')
         ->join('programas', 'programas_centros.programas_id','programas.id');
@@ -71,6 +66,15 @@ class ServiciosController extends Controller
         }
 
         $ofertas_programas = $ofertas_programas->paginate(10)->appends(request()->all());
+
+        if ($request->ajax()) {
+            return view('Servicios.oferta.tabla', compact('ofertas_programas'));
+        }
+
+        $programas = Programa::all();
+        $municipios = Municipio::all();
+        $centros = Centro::all();
+        $trimestres = Trimestre::all();
 
         return view('Servicios.oferta.index', compact('programas','municipios', 'centros', 'trimestres', 'ofertas_programas'));
     }

@@ -1283,7 +1283,7 @@ function crearOfertaDeCompetencia() {
 function filtrarOfertaPrograma() {
     event.preventDefault();
     let url = `${SERVER_URL}servicios/ofertas`;
-    let datos = $('#form_filtrar_oferta_programa').serialize();
+    let datos = $('#form_filtrar').serialize();
 
     $.ajax({
         url,
@@ -1291,7 +1291,7 @@ function filtrarOfertaPrograma() {
         data: datos,
         datatype: "json"
     }).done(function (msg) {
-        $("body").html(msg);
+        $("#tabla").html(msg);
     }).fail(function (jqXHR, textStatus) {
         console.log(jqXHR)
         console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);

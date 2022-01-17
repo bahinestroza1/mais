@@ -37,10 +37,10 @@ active
         </div>
         <div class="card-body">
             <div class="container-fluid">
-                <form id="form_filtrar_oferta_programa" onsubmit="filtrarOfertaPrograma()" autocomplete="off">
+                <form id="form_filtrar" onsubmit="filtrarOfertaPrograma()" autocomplete="off">
                     @csrf
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-3 mb-2">
                             <label for="filtro_centro">Centro</label>      
                             <select id="filtro_centro" name="filtro_centro" class="form-control" >
                                 <option selected value="null">TODOS</option>
@@ -50,7 +50,7 @@ active
                             </select>   
                         </div>
                         
-                        <div class="col-md-2">
+                        <div class="col-md-2 mb-2">
                             <label for="filtro_nivel_formacion">Nivel de Formación</label>      
                             <select id="filtro_nivel_formacion" name="filtro_nivel_formacion" class="form-control"  >   
                                 <option value="null">TODOS</option>                                        
@@ -63,7 +63,7 @@ active
                             </select>                          
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-3 mb-2">
                             <label for="filtro_programa">Programa</label>      
                             <select id="filtro_programa" name="filtro_programa" class="form-control"  >
                                 <option selected value="null">TODOS</option>
@@ -73,7 +73,7 @@ active
                             </select>   
                         </div>
                         
-                        <div class="col-md-2">
+                        <div class="col-md-2 mb-2">
                             <label for="filtro_municipio">Municipio</label>      
                             <select id="filtro_municipio" name="filtro_municipio" class="form-control"  >
                                 <option selected value="null">TODOS</option>
@@ -83,7 +83,7 @@ active
                             </select>   
                         </div>
 
-                        <div class="col-md-2">
+                        <div class="col-md-2 mb-2">
                             <label for="filtro_trimestre">Trimestre</label>
                             <select id="filtro_trimestre" name="filtro_trimestre" class="form-control"  >
                                 <option selected value="null">TODOS</option>
@@ -95,7 +95,7 @@ active
                             </select>
                         </div>     
 
-                        <div class="col-md-2">
+                        <div class="col-md-2 mb-2">
                             <label for="filtro_modalidad">Modalidad</label>
                             <select id="filtro_modalidad" name="filtro_modalidad" class="form-control"  >
                                 <option selected value="null">TODOS</option>
@@ -104,7 +104,7 @@ active
                             </select>
                         </div>                               
                         
-                        <div class="col-md-2">
+                        <div class="col-md-2 mb-2">
                             <label for="filtro_estado_oferta">Estado Oferta</label>
                             <select id="filtro_estado_oferta" name="filtro_estado_oferta" class="form-control"  >
                                 <option value="1" {{ (old('filtro_estado_oferta') === "1") ? 'selected' : '' }}>DISPONIBLE</option>
@@ -123,7 +123,7 @@ active
     </div>
 
     @if(isset($ofertas_programas))
-        <div id="tabla_oferta_programa">
+        <div id="tabla">
             @include('Servicios.oferta.tabla')
         </div>
     @endif
