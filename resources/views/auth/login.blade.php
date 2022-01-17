@@ -1,27 +1,41 @@
 @extends('layouts.app')
 
+@section('htmlheader_title')
+Ingreso
+@endsection
+
 @section('content')
-<div class="container">
+
+<div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Ingreso a SAM') }}</div>
+                <div class="card-header">{{ __('Ingreso a MAIS') }}</div>
 
                 <div class="card-body">
+                    @if (session('msg'))
+                        <div class="callout callout-danger">
+                            <h5>{{session('msg')}}</h5>
+                        </div>
+                    @endif
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
 
                         <div class="form-group row">
-                            <label for="tipo_documento" class="col-md-4 col-form-label text-md-right">{{ __('Tipo de documento') }}</label>
+                            <label for="tipos_documentos_id" class="col-md-4 col-form-label text-md-right">{{ __('Tipo de documento') }}</label>
 
                             <div class="col-md-6">
-                                <input id="tipo_documento" type="select" class="form-control @error('tipo_documento') is-invalid @enderror" name="tipo_documento" value="{{ old('tipo_documento') }}" required autocomplete="off" autofocus>
+                                <select name="tipos_documentos_id" id="tipos_documentos_id" class="form-control {{ $errors->has('tipos_documentos_id') ? 'is-invalid' : ''}}" required autofocus>
+                                    @foreach ($tipos as $tipo)
+                                        <option value="{{$tipo->id}}">{{$tipo->descripcion}}</option>
+                                    @endforeach
+                                </select>
 
-                                @error('tipo_documento')
+                                @if ($errors->has('tipos_documentos_id'))
                                     <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
+                                        <strong>{{ $errors->first('tipos_documentos_id') }}</strong>
                                     </span>
-                                @enderror
+                                @endif
                             </div>
                         </div>
 
@@ -29,13 +43,13 @@
                             <label for="documento" class="col-md-4 col-form-label text-md-right">{{ __('Documento') }}</label>
 
                             <div class="col-md-6">
-                                <input id="documento" type="number" class="form-control @error('email') is-invalid @enderror" name="documento" value="{{ old('documento') }}" required autocomplete="documento">
+                                <input id="documento" type="number" class="form-control {{ $errors->has('documento') ? 'is-invalid' : ''}}" name="documento" value="{{ old('documento') }}" required autocomplete="documento" placeholder="Número de documento">
 
-                                @error('documento')
+                                @if ($errors->has('documento'))
                                     <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
+                                        <strong>{{ $errors->first('documento') }}</strong>
                                     </span>
-                                @enderror
+                                @endif
                             </div>
                         </div>
 
@@ -43,13 +57,13 @@
                             <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Contraseña') }}</label>
 
                             <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
+                                <input id="password" type="password" class="form-control {{ $errors->has('password') ? 'is-invalid' : ''}}" name="password" required autocomplete="current-password" placeholder="Contraseña">
 
-                                @error('password')
+                                @if ($errors->has('password'))
                                     <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
+                                        <strong>{{ $errors->first('password') }}</strong>
                                     </span>
-                                @enderror
+                                @endif
                             </div>
                         </div>
 

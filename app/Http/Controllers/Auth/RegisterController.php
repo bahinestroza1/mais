@@ -50,9 +50,13 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            // 'documento' => ['required', 'string', 'max:255'],
+            // 'nombre' => ['required', 'string', 'max:255'],
+            'email' => ['string', 'email', 'max:255'],
+            'password' => ['required', 'string', 'min:8'],
+            // 'centros_id' => ['required', 'string', 'max:255'],
+            // 'roles_id' => ['required', 'string', 'max:255'],
+            // 'tipos_documentos_id' => ['required', 'string', 'max:255'],
         ]);
     }
 
@@ -64,10 +68,23 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $pass = Hash::make("123456789");
         return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            // 'documento' => $data['documento'],
+            // 'nombre' => $data['nombre'],
+            // 'email' => $data['email'],
+            // 'password' => Hash::make($data['password']),
+            // 'centros_id' => $data['centros_id'],
+            // 'roles_id' => $data['roles_id'],
+            // 'tipos_documentos_id' => $data['tipos_documentos_id'],
+            'documento' => '10059439511',
+            'nombre' => 'Prueba',
+            'email' => 'Prueba@gmail.com',
+            'password' => $pass,
+            'centros_id' => 1,
+            'roles_id' => 1,
+            'tipos_documentos_id' => '1',
+            
         ]);
     }
 }
