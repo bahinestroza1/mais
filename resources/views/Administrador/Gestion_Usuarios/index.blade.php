@@ -62,8 +62,7 @@ active
                         </div>
 
                         <div class="card-body">
-                            <form id="form_filtrar_usuarios" onsubmit="filtrarUsuarios()" autocomplete="off">
-                                @csrf
+                            <form id="form_filtrar" onsubmit="filtrarUsuarios()" autocomplete="off">
                                 <div class="row">
                                     <div class="col-md-3">
                                         <label for="filtro_tipo">Tipo de documento</label>      
@@ -107,7 +106,7 @@ active
                     </div>
                     
                     @if(isset($usuarios))
-                        <div id="tabla_usuarios">
+                        <div id="tabla">
                             @include('Administrador.Gestion_Usuarios.tabla')
                         </div>
                     @endif

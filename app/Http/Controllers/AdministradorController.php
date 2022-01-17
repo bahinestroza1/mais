@@ -135,7 +135,11 @@ class AdministradorController extends Controller
             $usuarios->where('estado', 1);
         }
 
-        $usuarios= $usuarios->paginate(10)->appends(request()->all());
+        $usuarios= $usuarios->paginate(5)->appends(request()->all());
+
+        if ($request->ajax()) {
+            return view('Administrador.Gestion_Usuarios.tabla', compact('usuarios'));
+        }
 
         return view('Administrador.Gestion_Usuarios.index', compact('usuarios', 'tipo_documentos', 'municipios'));
     }

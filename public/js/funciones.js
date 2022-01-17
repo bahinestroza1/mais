@@ -102,7 +102,7 @@ function cargarModalEditarMunicipio(idMunicipio) {
 function filtrarUsuarios() {
     event.preventDefault();
     let url = `${SERVER_URL}admon/gestion_usuarios`;
-    let datos = $('#form_filtrar_usuarios').serialize();
+    let datos = $('#form_filtrar').serialize();
 
     const documentoUsuario = $('#filtro_documento').val();
 
@@ -122,7 +122,7 @@ function filtrarUsuarios() {
         data: datos,
         datatype: "json"
     }).done(function (msg) {
-        $("body").html(msg);
+        $("#tabla").html(msg);
     }).fail(function (jqXHR, textStatus) {
         console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);
     });
