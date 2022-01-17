@@ -1376,6 +1376,11 @@ class AdministradorController extends Controller
         }
 
         $programas = $programas->paginate(10)->appends(request()->all());
+
+        if ($request->ajax()) {
+            return view('Administrador.Gestion_Programas.tabla', compact('programas'));
+        }
+
         return view('Administrador.Gestion_Programas.index', compact('programas'));
     }
 

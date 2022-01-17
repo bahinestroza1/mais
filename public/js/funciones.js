@@ -695,7 +695,7 @@ function eliminarFuncionario(idFuncionario) {
 function filtrarProgramas() {
     event.preventDefault();
     let url = `${SERVER_URL}admon/gestion_programas`;
-    let datos = $('#form_filtrar_programas').serialize();
+    let datos = $('#form_filtrar').serialize();
 
     $.ajax({
         url,
@@ -703,7 +703,7 @@ function filtrarProgramas() {
         data: datos,
         datatype: "json"
     }).done(function (msg) {
-        $("body").html(msg);
+        $("#tabla").html(msg);
     }).fail(function (jqXHR, textStatus) {
         console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);
     });

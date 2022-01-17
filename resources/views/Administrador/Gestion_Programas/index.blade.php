@@ -38,7 +38,7 @@ active
                     <div class="card card-primary card-outline">
                     <div class="card-header">Búsqueda de programas</div>
                         <div class="card-body">
-                            <form id="form_filtrar_programas" onsubmit="filtrarProgramas()" autocomplete="off">
+                            <form id="form_filtrar" onsubmit="filtrarProgramas()" autocomplete="off">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-3">
@@ -93,7 +93,7 @@ active
                     <div id="contenido_programas" ></div>
 
                     @if(isset($programas))
-                        <div id="tabla_programas">
+                        <div id="tabla">
                             @include('Administrador.Gestion_Programas.tabla')
                         </div>
                     @endif
