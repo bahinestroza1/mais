@@ -118,6 +118,14 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{route('ver_ofertas_competencias')}}" class="nav-link @yield('menu-servicios-oferta-competencia','')">
+                          <i class="nav-icon fas fa-circle-notch"></i>
+                          <p>
+                              Oferta Competencias SENA
+                          </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{route('ver_solicitudes')}}" class="nav-link @yield('menu-servicios-solicitudes','')">
                           <i class="nav-icon fas fa-circle-notch"></i>
                           <p>

@@ -7,6 +7,7 @@ $('.pagination a').on('click', function (e) {
     $.get(url, $('#form_filtrar').serialize(), function (data) {
         $('#tabla').html(data);
     });
+    return;
 });
 
 function change_custom_file(input, idLabel) {
@@ -1170,19 +1171,18 @@ function editarOfertaDePrograma() {
 
 function filtrarOfertaCompetencias() {
     event.preventDefault();
-    let url = `${SERVER_URL}admon/gestion_ofertas/buscarCompetencia`;
-    let datos = $('#form_filtrar_oferta_competencias').serialize();
+    let url = `${SERVER_URL}admon/gestion_ofertas`;
+    let datos = $('#contenedor_oferta_competencia #form_filtrar').serialize();
 
     $.ajax({
         url,
         method: "GET",
-        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
         data: datos,
         datatype: "json"
     }).done(function (msg) {
-        console.log(msg)
-        $("#tabla_ofertas_competencias").html(msg);
+        $("#contenedor_oferta_competencia #tabla").html(msg);
     }).fail(function (jqXHR, textStatus) {
+        console.log(jqXHR)
         console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);
     });
 }
@@ -1276,6 +1276,114 @@ function crearOfertaDeCompetencia() {
     })
 }
 
+function cargarModalOfertaCompetencia(editar, idOfertaCompetencia) {
+    event.preventDefault();
+    $(`#btn_oferta_competencia_${idOfertaCompetencia}`).prop('disabled', true);
+
+    let url = `${SERVER_URL}admon/gestion_ofertas/competencia`
+
+    $.ajax({
+        url,
+        method: "POST",
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+        data: {
+            idOfertaCompetencia,
+            editar
+        },
+        datatype: "json"
+
+    }).done(function (msg) {
+        if ($('.modal-backdrop').is(':visible')) {
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+        }
+
+        $("#oferta_competencia_modal_container").html(msg);
+
+        $('#modal_oferta_competencia').modal('toggle');
+
+    }).fail(function (jqXHR, textStatus) {
+        console.log(jqXHR)
+        console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);
+    }).always(function () {
+        $(`#btn_oferta_competencia_${idOfertaCompetencia}`).prop('disabled', false);
+    });
+}
+
+function editarOfertaDeCompetencia() {
+    event.preventDefault();
+    swal.fire({
+        icon: 'warning',
+        title: '¿Estás seguro?',
+        showConfirmButton: true,
+        confirmButtonText: 'Aceptar',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar'
+    }).then(({ isConfirmed }) => {
+        if (isConfirmed) {
+            $(`#btn_editar_oferta_competencia`).prop('disabled', true);
+
+            // const errors = validarCreacionOfertaCompetencia();
+            // if (Object.keys(errors).length > 0) {
+            //     Object.values(errors).forEach(error => {
+            //         $(`#${error[0]}`).addClass('is-invalid');
+            //         $(`#validation_${error[0]}`).html(error[1]);
+            //     });
+            //     $(`#btn_editar_oferta_competencia`).prop('disabled', false);
+            //     return;
+            // }
+
+            let url = `${SERVER_URL}admon/gestion_ofertas/editarCompetencia`;
+            let datos = $('#form_editar_oferta_competencia').serialize();
+
+            $.ajax({
+                url,
+                method: "POST",
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                data: datos,
+                datatype: "json"
+
+            }).done(response => {
+                if (Array.isArray(response)) {
+                    let errors = '<div class="alert alert-danger">';
+                    response.forEach(error => {
+                        errors += `<p class="m-0">${error}</p>`;
+                    });
+                    errors += '</div>';
+
+                    $('#form_ofertas_competencias_errors').html(errors);
+                    return;
+                }
+
+                let data = JSON.parse(response);
+
+                if (data.type == 'error') {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        confirmButtonText: 'Aceptar',
+                        text: data.message
+                    })
+                } else {
+                    swal.fire({
+                        icon: 'success',
+                        title: 'Correcto!',
+                        confirmButtonText: 'Aceptar',
+                        text: data.message
+                    }).then(() => {
+                        filtrarOfertaCompetencias();
+                        $('#modal_oferta_competencia').modal('hide');
+                    });
+                }
+
+            }).fail(function (jqXHR, textStatus) {
+                console.log(jqXHR)
+                console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);
+            }).always(() => $(`#btn_editar_oferta_competencia`).prop('disabled', false));
+        }
+    })
+}
+
 /**
  * Servicios
  */
@@ -1328,6 +1436,58 @@ function cargarModalVerOfertaPrograma(idOfertaPrograma) {
         $(`#btn_ver_oferta_programa_${idOfertaPrograma}`).prop('disabled', false);
     });
 }
+
+function cargarModalVerOfertaCompetencia(idOfertaCompetencia) {
+    event.preventDefault();
+    $(`#btn_ver_oferta_competencia_${idOfertaCompetencia}`).prop('disabled', true);
+
+    let url = `${SERVER_URL}servicios/ofertasCompetencia`
+
+    $.ajax({
+        url,
+        method: "POST",
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+        data: { idOfertaCompetencia },
+        datatype: "json"
+
+    }).done(function (msg) {
+        if ($('.modal-backdrop').is(':visible')) {
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+        }
+
+        $("#ver_oferta_competencia_modal_container").html(msg);
+
+        $('#modal_ver_oferta_competencia').modal('toggle');
+
+    }).fail(function (jqXHR, textStatus) {
+        console.log(jqXHR)
+        console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);
+    }).always(function () {
+        $(`#btn_ver_oferta_competencia_${idOfertaCompetencia}`).prop('disabled', false);
+    });
+}
+
+
+function filtrarOfertasCompetencias() {
+    event.preventDefault();
+    let url = `${SERVER_URL}servicios/ofertasCompetencia`;
+    let datos = $('#form_filtrar').serialize();
+
+    $.ajax({
+        url,
+        method: "GET",
+        data: datos,
+        datatype: "json"
+    }).done(function (msg) {
+        $("#tabla").html(msg);
+    }).fail(function (jqXHR, textStatus) {
+        console.log(jqXHR)
+        console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);
+    });
+}
+
+
 
 
 function filtrarSolicitudes() {
@@ -1468,8 +1628,8 @@ function crearSolicitud() {
                         confirmButtonText: 'Aceptar',
                         text: data.message
                     }).then(() => {
-                        // filtrarSolicitudes();
-                        // $('#modal_crear_solicitud').modal('hide');
+                        filtrarSolicitudes();
+                        $('#modal_crear_solicitud').modal('hide');
                         //window.location.reload();
                     });
                 }
@@ -1500,7 +1660,6 @@ function cargarModalVerSolicitud(idSolicitud) {
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
         }
-        console.log("Aqu")
 
         $("#ver_solicitud_modal_container").html(msg);
 
@@ -1545,7 +1704,7 @@ function cargarModalTomarSolicitudOfertaPrograma(idSolicitud) {
     });
 }
 
-function tomarSolicitud(idSolicitud, idOferta = null) {
+function tomarSolicitud(idSolicitud, idOferta = null, tipoServicio = null) {
     event.preventDefault();
     swal.fire({
         icon: 'question',
@@ -1565,7 +1724,8 @@ function tomarSolicitud(idSolicitud, idOferta = null) {
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                 data: {
                     idSolicitud,
-                    idOferta
+                    idOferta,
+                    tipoServicio
                 },
                 datatype: "json"
 

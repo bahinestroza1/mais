@@ -80,7 +80,8 @@ Route::post('/admon/gestion_ofertas/carga_masiva', [AdministradorController::cla
 Route::get('/admon/gestion_ofertas/crearCompetencia', [AdministradorController::class, 'crear_ofertas_competencia'])->name('crear_ofertas_competencia');
 Route::post('/admon/gestion_ofertas/crearCompetencia', [AdministradorController::class, 'crear_ofertas_competencia'])->name('crear_ofertas_competencia');
 Route::get('/admon/gestion_ofertas/buscarCompetencia', [AdministradorController::class, 'buscar_ofertas_competencia'])->name('buscar_ofertas_competencia');
-
+Route::post('/admon/gestion_ofertas/competencia', [AdministradorController::class, 'ver_ofertas_competencia'])->name('ver_ofertas_competencia');
+Route::post('/admon/gestion_ofertas/editarCompetencia', [AdministradorController::class, 'editar_ofertas_competencia'])->name('editar_ofertas_competencia');
 
 //Gestion de programas
 Route::get('/admon/gestion_programas', [AdministradorController::class, 'gestion_programas'])->name('gestion_programas');
@@ -100,6 +101,8 @@ Route::post('/admon/gestion_programas/editar', [AdministradorController::class, 
  // Oferta
 Route::get('/servicios/ofertas', [ServiciosController::class, 'ver_ofertas'])->name('ver_ofertas');
 Route::post('/servicios/ofertas', [ServiciosController::class, 'ver_oferta'])->name('ver_oferta');
+Route::get('/servicios/ofertasCompetencia', [ServiciosController::class, 'ver_ofertas_competencias'])->name('ver_ofertas_competencias');
+Route::post('/servicios/ofertasCompetencia', [ServiciosController::class, 'ver_oferta_competencia'])->name('ver_oferta_competencia');
 
 // Solicitud
 Route::get('/servicios/solicitudes', [ServiciosController::class, 'ver_solicitudes'])->name('ver_solicitudes');

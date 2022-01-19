@@ -97,6 +97,66 @@ class ServiciosController extends Controller
 
     }
 
+    public function ver_ofertas_competencias(Request $request)
+    {
+        acceso_a(1,2,3,4);
+        $request->flash();
+        $data = $request->all();
+
+        $ofertas_competencias = Oferta_Competencia_Laboral::select('ofertas_competencias.*')
+        ->join('competencias_laborales_centros', 'ofertas_competencias.competencias_laborales_centros_id','competencias_laborales_centros.id')
+        ->join('competencias_laborales','competencias_laborales_centros.competencias_id','competencias_laborales.id');
+
+        if(isset($data['filtro_nombre']) && $data['filtro_nombre'] != "null"){
+            $ofertas_competencias->where('competencias_laborales.nombre', 'like', "%".$data['filtro_nombre']."%");
+        }
+
+        if(isset($data['filtro_codigo_nscl']) && $data['filtro_codigo_nscl'] != "null"){
+            $ofertas_competencias->where('competencias_laborales.codigo_nscl', 'like', "%".$data['filtro_codigo_nscl']."%");
+        }
+        
+        if(isset($data['filtro_centro']) && $data['filtro_centro'] != "null"){
+            $ofertas_competencias->where('competencias_laborales_centros.centros_id', $data['filtro_centro']);
+        }
+
+        if(isset($data['filtro_municipio']) && $data['filtro_municipio'] != "null"){
+            $ofertas_competencias->where('ofertas_competencias.municipios_id', $data['filtro_municipio']);
+        }
+
+        if(isset($data['filtro_trimestre']) && $data['filtro_trimestre'] != "null"){
+            $ofertas_competencias->where('ofertas_competencias.trimestre', $data['filtro_trimestre']);
+        }
+
+        if(isset($data['filtro_estado_oferta']) && $data['filtro_estado_oferta'] != "null"){
+            $ofertas_competencias->where('ofertas_competencias.estado', $data['filtro_estado_oferta']);
+        }else{
+            $ofertas_competencias->where('ofertas_competencias.estado', 1);
+        }
+
+        $ofertas_competencias = $ofertas_competencias->paginate(5)->appends(request()->all());
+
+        if ($request->ajax()) {
+            return view('Servicios.oferta.competencia_laboral.tabla', compact('ofertas_competencias'));
+        }
+
+        $municipios = Municipio::all();
+        $centros = Centro::all();
+        $trimestres = Trimestre::all();
+
+        return view('Servicios.oferta.competencia_laboral.index', compact('municipios', 'centros', 'trimestres', 'ofertas_competencias'));
+    }
+
+    public function ver_oferta_competencia(Request $request)
+    {
+        acceso_a(1,2,3,4);
+        $data = $request->all();
+
+        $oferta_competencia = Oferta_Competencia_Laboral::find($data['idOfertaCompetencia']);
+
+        return view('Servicios.oferta.competencia_laboral.modal', compact('oferta_competencia'));
+
+    }
+
     //
     public function ver_solicitudes(Request $request)
     {
@@ -118,17 +178,30 @@ class ServiciosController extends Controller
 
         if (tiene_rol(4,2)) {
             // Solicitudes que el centro tenga oferta ó no sea de tipo formacion o competencia laboral
-            $ofertas_centros = Oferta_Programa::select('programas_centros.programas_id')
+            $ofertas_programas = Oferta_Programa::select('programas_centros.programas_id')
             ->join('programas_centros','ofertas_programas.programas_centros_id', 'programas_centros.id')
             ->where('programas_centros.centros_id', Auth::user()->centros_id)->get();
 
-            $solicitudes->whereIn('programas_id', $ofertas_centros)
-            ->orWhereNotIn('solicitudes.servicios_id', [3,4]);
-
-            $ofertas_centros = $ofertas_centros->where('programas_id', $solicitudes->pluck('programas_id'));            
+            $ofertas_competencias = Oferta_Competencia_Laboral::select('competencias_laborales_centros.competencias_id')
+            ->join('competencias_laborales_centros', 'ofertas_competencias.competencias_laborales_centros_id','competencias_laborales_centros.id')
+            ->where('competencias_laborales_centros.centros_id', Auth::user()->centros_id)->get();
+            
+            $solicitudes->where(function ($query) use ( $ofertas_programas, $ofertas_competencias ) {
+                $query->whereIn('programas_id', $ofertas_programas)
+                ->orWhereIn('competencias_id', $ofertas_competencias)
+                ->orWhereNotIn('solicitudes.servicios_id', [3,4]);
+            });
+            
+            $solicitudes->orderBy('solicitudes.estado');
+                    
             $solicitudes = $solicitudes->paginate(10)->appends(request()->all());
-
-            return view('Servicios.solicitudes.index', compact('solicitudes', 'servicios', 'ofertas_centros'));
+            
+            if ($request->ajax()) {
+                return view('Servicios.solicitudes.tabla', compact('solicitudes'));
+            }
+            
+            $servicios = Servicio::all();
+            return view('Servicios.solicitudes.index', compact('solicitudes', 'servicios'/*, 'ofertas_centros'*/));
         }
 
         $solicitudes = $solicitudes->paginate(3)->appends(request()->all());
@@ -171,7 +244,6 @@ class ServiciosController extends Controller
                 case '3':
                     $ofertas_centros = Oferta_Programa::select('ofertas_programas.*')
                     ->join('programas_centros','ofertas_programas.programas_centros_id', 'programas_centros.id')
-                    ->where('ofertas_programas.estado', 1)
                     ->where('programas_centros.programas_id', $solicitud->programas_id)
                     ->where('programas_centros.centros_id', Auth::user()->centros_id)->get();
                     break;
@@ -220,41 +292,59 @@ class ServiciosController extends Controller
                 return json_encode(["type"=> "error", "message"=>"Error. No se ha podido asignar la SOLICITUD."]);
             }
         } else {
+            // Es un servicio de formacion
             try {
-                DB::beginTransaction();
-
-                $oferta_programa = Oferta_Programa::find($data['idOferta']);
-
-                if ($oferta_programa == null) {
-                    return json_encode(["type"=> "error", "message"=>"No se encontró la OFERTA DEL PROGRAMA."]);
-                }
-
-                $solicitud->estado = 2;
-                $solicitud->fecha_aprobacion = now();
-                $solicitud->funcionarios_aprobo_id = Auth::user()->id;
-                if ($solicitud->servicios_id == 3) {
-                    // Es un servicio de formacion
-                    $solicitud->ofertas_programas_id = $data['idOferta'];    
-                } else {
-                    // Es un servicio de competencia laboral
-                    $solicitud->ofertas_competencias_id = $data['idOferta'];    
-                }
-
-                if($solicitud->save()){
-                    $oferta_programa->estado = 2;
-
-                    if ($oferta_programa->save()) {
-                        DB::commit();
-                        return json_encode(["type"=> "success", "message"=>"Se ha asignado la SOLICITUD correctamente."]);
+                if ($data['tipoServicio'] == 3) {
+                    $oferta_programa = Oferta_Programa::find($data['idOferta']);
+                    if ($oferta_programa == null) {
+                        return json_encode(["type"=> "error", "message"=>"No se encontró la OFERTA DEL PROGRAMA."]);
                     }
+                    DB::beginTransaction();
+
+                    $solicitud->estado = 2;
+                    $solicitud->fecha_aprobacion = now();
+                    $solicitud->funcionarios_aprobo_id = Auth::user()->id;  
+                    $solicitud->ofertas_programas_id = $data['idOferta'];    
+
+                    if($solicitud->save()){
+                        $oferta_programa->estado = 2;    
+                        if ($oferta_programa->save()) {
+                            DB::commit();
+                            return json_encode(["type"=> "success", "message"=>"Se ha asignado la SOLICITUD correctamente."]);
+                        }
+                    }
+                    DB::rollBack();
+                    return json_encode(["type"=> "error", "message"=>"No se ha podido asignar la SOLICITUD."]);
+
+                }else{
+
+                    $oferta_competencia = Oferta_Competencia_Laboral::find($data['idOferta']);
+                    if ($oferta_competencia == null) {
+                        return json_encode(["type"=> "error", "message"=>"No se encontró la COMPETENCIA LABORAL."]);
+                    }
+                    DB::beginTransaction();
+
+                    $solicitud->estado = 2;
+                    $solicitud->fecha_aprobacion = now();
+                    $solicitud->funcionarios_aprobo_id = Auth::user()->id;  
+                    $solicitud->ofertas_competencias_id = $data['idOferta'];    
+
+                    if($solicitud->save()){
+                        $oferta_competencia->estado = 2;    
+                        if ($oferta_competencia->save()) {
+                            DB::commit();
+                            return json_encode(["type"=> "success", "message"=>"Se ha asignado la SOLICITUD correctamente."]);
+                        }
+                    }
+
+                    DB::rollBack();
+                    return json_encode(["type"=> "error", "message"=>"No se ha podido asignar la SOLICITUD."]);
+
                 }
-                DB::rollBack();
-                return json_encode(["type"=> "error", "message"=>"No se ha podido asignar la SOLICITUD."]);
-                
             } catch (\Throwable $th) {
                 DB::rollBack();
                 return json_encode(["type"=> "error", "message"=>"Error. No se ha podido asignar la SOLICITUD."]);
-            }
+            }                
         }
     }
 
@@ -295,7 +385,6 @@ class ServiciosController extends Controller
                 
             } catch (\Throwable $th) {
                 DB::rollBack();    
-                return json_encode(["type"=> "error", "message"=>$th]);
                 return json_encode(["type"=> "error", "message"=>"La solicitud no ha podido ser creada."]);
             }
 

@@ -8,6 +8,8 @@ class Oferta_Competencia_Laboral extends Model
 {
     protected $table = 'ofertas_competencias';
 
+    public $fillable = ['trimestres_id'];
+
     public function municipio()
     {
         return $this->belongsTo(Municipio::class, 'municipios_id', 'id');
@@ -26,5 +28,15 @@ class Oferta_Competencia_Laboral extends Model
     public function servicio()
     {
         return $this->belongsTo(Servicio::class,'servicios_id','id');
+    }
+
+    public function registrado_por()
+    {
+        return $this->belongsTo(Funcionario::class,'funcionarios_id','id');
+    }
+
+    public function actualizado_por()
+    {
+        return $this->belongsTo(Funcionario::class,'funcionarios_updated_id','id');
     }
 }

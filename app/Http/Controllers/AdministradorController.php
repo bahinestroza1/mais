@@ -734,7 +734,6 @@ class AdministradorController extends Controller
             return json_encode(["type"=> "error", "message"=>"El funcionario no pudo ser actualizado"]);  
 
         }catch(Exception $ex){
-            dd($ex);
             DB::rollback();
             return json_encode(["type"=> "error", "message"=>"El funcionario no pudo ser actualizado"]);  
         }        
@@ -773,62 +772,90 @@ class AdministradorController extends Controller
 
         $request->flash();
         $data = $request->all();
-
+        
         $ofertas_programas = Oferta_Programa::select('ofertas_programas.*')
         ->join('programas_centros', 'ofertas_programas.programas_centros_id','programas_centros.id')
         ->join('programas', 'programas_centros.programas_id','programas.id');
 
-        if(isset($data['filtro_programa']) && $data['filtro_programa'] != "null"){
-            $ofertas_programas->where('programas.id', $data['filtro_programa']);
+        $ofertas_competencias = Oferta_Competencia_Laboral::select('ofertas_competencias.*')
+        ->join('competencias_laborales_centros', 'ofertas_competencias.competencias_laborales_centros_id','competencias_laborales_centros.id')
+        ->join('competencias_laborales', 'competencias_laborales_centros.competencias_id','competencias_laborales.id');
+
+        // ofertas de programas de formación
+        if(isset($data['filtro_programa_programas']) && $data['filtro_programa_programas'] != "null"){
+            $ofertas_programas->where('programas.id', $data['filtro_programa_programas']);
         }
 
-        if(isset($data['filtro_nivel_formacion']) && $data['filtro_nivel_formacion'] != "null"){
-            $ofertas_programas->where('programas.nivel_formacion', $data['filtro_nivel_formacion']);
+        if(isset($data['filtro_nivel_formacion_programas']) && $data['filtro_nivel_formacion_programas'] != "null"){
+            $ofertas_programas->where('programas.nivel_formacion', $data['filtro_nivel_formacion_programas']);
         }
 
-        if(isset($data['filtro_modalidad']) && $data['filtro_modalidad'] != "null"){
-            $ofertas_programas->where('ofertas_programas.modalidad', $data['filtro_modalidad']);
+        if(isset($data['filtro_modalidad_programas']) && $data['filtro_modalidad_programas'] != "null"){
+            $ofertas_programas->where('ofertas_programas.modalidad', $data['filtro_modalidad_programas']);
         }
 
         if (tiene_rol(1)) {
-            if(isset($data['filtro_centro']) && $data['filtro_centro'] != "null"){
-                $ofertas_programas->where('programas_centros.centros_id', $data['filtro_centro']);
+            if(isset($data['filtro_centro_programas']) && $data['filtro_centro_programas'] != "null"){
+                $ofertas_programas->where('programas_centros.centros_id', $data['filtro_centro_programas']);
             }
         }else{
             $ofertas_programas->where('programas_centros.centros_id', Auth::user()->centros_id );
         }        
 
+        if(isset($data['filtro_municipio_programas']) && $data['filtro_municipio_programas'] != "null"){
+            $ofertas_programas->where('ofertas_programas.municipios_id', $data['filtro_municipio_programas']);
+        }
+
+        if(isset($data['filtro_trimestre_programas']) && $data['filtro_trimestre_programas'] != "null"){
+            $ofertas_programas->where('ofertas_programas.trimestreS_ID', $data['filtro_trimestre_programas']);
+        }
+        
+        $ofertas_programas = $ofertas_programas->paginate(5,['*'],'programas')->appends(request()->all());
+
+        //ofertas de competencias laborales
+        if(isset($data['filtro_nombre']) && $data['filtro_nombre'] != "null"){
+            $ofertas_competencias->where('competencias_laborales.nombre', 'like' , "%".$data['filtro_nombre']."%");
+        }
+
+        if(isset($data['filtro_codigo_nscl']) && $data['filtro_codigo_nscl'] != "null"){
+            $ofertas_competencias->where('competencias_laborales.codigo_nscl', $data['filtro_codigo_nscl']);
+        }
+
         if(isset($data['filtro_municipio']) && $data['filtro_municipio'] != "null"){
-            $ofertas_programas->where('ofertas_programas.municipios_id', $data['filtro_municipio']);
+            $ofertas_competencias->where('ofertas_competencias.municipios_id', $data['filtro_municipio']);
         }
 
         if(isset($data['filtro_trimestre']) && $data['filtro_trimestre'] != "null"){
-            $ofertas_programas->where('ofertas_programas.trimestreS_ID', $data['filtro_trimestre']);
+            $ofertas_competencias->where('ofertas_competencias.trimestre', $data['filtro_trimestre']);
         }
 
-        $ofertas_programas = $ofertas_programas->paginate(10)->appends(request()->all());
-        
-        $ofertas_competencias = Oferta_Competencia_Laboral::select('*'); 
+        if (tiene_rol(1)) {
+            if(isset($data['filtro_centro']) && $data['filtro_centro'] != "null"){
+                $ofertas_competencias->where('competencias_laborales_centros.centros_id', $data['filtro_centro'] );
+            }
+        }else{
+            $ofertas_competencias->where('competencias_laborales_centros.centros_id', Auth::user()->centros_id );
+        }
 
-        // if (!tiene_rol(1)) {
-        //     $ofertas_competencias->where('competencias_laborales_centros_id', Auth::user()->centros_id );
-        // }
-        // $ofertas_competencias= $ofertas_competencias->paginate(10)->appends(request()->all());
+        $ofertas_competencias= $ofertas_competencias->paginate(5,['*'],'competencias')->appends(request()->all());
+
 
         if ($request->ajax()) {
             // Si la búsqueda es una oferta de programas de formación
             if ($data["type"] == 0) {
                 return view('Administrador.Gestion_Ofertas.programas.tabla', compact('ofertas_programas'));
+            }else{
+                return view('Administrador.Gestion_Ofertas.competencia_laboral.tabla_competencia', compact('ofertas_competencias'));
             }
-        }
+        }  
 
         $programas = Programa::all();
         $municipios = Municipio::all();
         $centros = Centro::all();
         $trimestres = Trimestre::all();
-        // $competencias = Competencia_Laboral::all();
+        $competencias = Competencia_Laboral::all();
 
-        return view('Administrador.Gestion_Ofertas.programas.index', compact('programas', /*'competencias',*/ 'municipios',  'centros', 'trimestres', 'ofertas_programas'/*, 'ofertas_competencias'*/));
+        return view('Administrador.Gestion_Ofertas.index', compact('programas', 'competencias', 'municipios',  'centros', 'trimestres', 'ofertas_programas', 'ofertas_competencias'));
     }
 
     public function buscar_ofertas(Request $request)
@@ -1242,7 +1269,7 @@ class AdministradorController extends Controller
             $ofertas_competencias->where('ofertas_competencias.trimestre', $data['filtro_trimestre']);
         }
 
-        $ofertas_competencias = $ofertas_competencias->paginate(10)->appends(request()->all());
+        $ofertas_competencias = $ofertas_competencias->paginate(5)->appends(request()->all());
         
         return view('Administrador.Gestion_Ofertas.competencia_laboral.tabla_competencia', compact('ofertas_competencias'));
     }
@@ -1279,25 +1306,29 @@ class AdministradorController extends Controller
             if ($competencia_laboral_centro->exists()) {
                 try{
                     DB::beginTransaction();
-                        Oferta_Competencia_Laboral::create([
-                            "trimestres_id" =>  $data['trimestre'],
-                            "duracion" =>  $data['duracion'],
-                            "fecha_inicio" =>  $data['fecha_inicio'],
-                            "fecha_fin" =>  $data['fecha_fin'],
-                            "cupos" =>  $data['cupos'],
-                            "municipios_id" => $data['municipio'],
-                            "servicios_id" => 4,
-                            "competencias_laborales_centros_id" => $competencia_laboral_centro->first()->id
-                        ]);
-            
+                    $new_oferta_competencia = new Oferta_Competencia_Laboral;
+                    $new_oferta_competencia->trimestres_id = $data['trimestre'];
+                    $new_oferta_competencia->duracion = $data['duracion'];
+                    $new_oferta_competencia->fecha_inicio = $data['fecha_inicio'];
+                    $new_oferta_competencia->fecha_fin = $data['fecha_fin'];
+                    $new_oferta_competencia->cupos = $data['cupos'];
+                    $new_oferta_competencia->municipios_id = $data['municipio'];
+                    $new_oferta_competencia->servicios_id = 4;
+                    $new_oferta_competencia->competencias_laborales_centros_id = $competencia_laboral_centro->first()->id;
+
+                    if ($new_oferta_competencia->save()) {
                         DB::commit();
-                        return json_encode(["type"=> "success", "message"=>"La oferta de programa se creo correctamente."]);       
+                        return json_encode(["type"=> "success", "message"=>"La oferta de competencia laboral se creo correctamente."]);       
+                    }
+                    DB::rollback();
+                    return json_encode(["type"=> "error", "message"=>"No se pudo crear la oferta de la competencia laboral."]);
+
                 }catch(Exception $ex){
                     DB::rollback();
-                    return json_encode(["type"=> "error", "message"=>"La oferta de programa no pudo ser creada."]);
+                    return json_encode(["type"=> "error", "message"=>"No se pudo crear la oferta de la competencia laboral."]);
                 }   
             }else{
-                // return json_encode(["type"=> "error", "message"=>"El CENTRO no cuenta con la CERTIFICACIÓN LABORAL asociada."]);
+                // return json_encode(["type"=> "error", "message"=>"El CENTRO no cuenta con la COMPETENCIA LABORAL asociada."]);
                 try {
                     DB::beginTransaction();
                     $new_competencia_centro = new Competencia_Laboral_Centro;
@@ -1318,19 +1349,18 @@ class AdministradorController extends Controller
 
                         if ($new_oferta->save()) {
                             DB::commit();
-                            return json_encode(["type"=> "success", "message"=>"La oferta de la certificación laboral se creo correctamente."]);                         
+                            return json_encode(["type"=> "success", "message"=>"La oferta de competencia laboral se creo correctamente."]);                       
                         }   
                         DB::rollBack();    
-                        return json_encode(["type"=> "error", "message"=>"No se pudo crear la oferta de la certificación laboral."]);
+                        return json_encode(["type"=> "error", "message"=>"No se pudo crear la oferta de la competencia laboral."]);
                     }else{
                         DB::rollBack();    
-                        return json_encode(["type"=> "error", "message"=>"No se pudo crear la oferta de la certificación laboral."]);
+                        return json_encode(["type"=> "error", "message"=>"No se pudo crear la oferta de la competencia laboral."]);
                     }
                     
                 } catch (\Throwable $th) {
                     DB::rollBack();    
-                    return json_encode(["type"=> "error", "message"=>$th]);
-                    return json_encode(["type"=> "error", "message"=>"No se pudo asociar la CERTIFICACIÓN LABORAL al CENTRO."]);
+                    return json_encode(["type"=> "error", "message"=>"No se pudo asociar la COMPETENCIA LABORAL al CENTRO."]);
                 }
             }
         }
@@ -1347,6 +1377,128 @@ class AdministradorController extends Controller
         $competencias = Competencia_Laboral_Centro::where('centros_id', Auth::user()->centros_id);
 
         return view('Administrador.Gestion_Ofertas.competencia_laboral.modal_crear_oferta_competencias', compact('municipios', 'competencias', 'trimestres'));
+    }
+
+    public function ver_ofertas_competencia(Request $request)
+    {
+        acceso_a(1,2,3);
+        $data = $request->all();
+
+        $oferta_competencia = Oferta_Competencia_Laboral::find($data['idOfertaCompetencia']);
+        $editar = $data['editar'] == 1;
+
+        $municipios = Municipio::all();
+        $competencias = Competencia_Laboral::all();
+        $trimestres = Trimestre::all()->where('estado', 1);        
+
+        if (tiene_rol(1)) {
+            $centros = Centro::all();
+            return view('Administrador.Gestion_Ofertas.competencia_laboral.modal_oferta_competencia', compact('oferta_competencia','municipios', 'competencias', 'trimestres', 'centros', 'editar'));
+        }
+
+        $competencias->whereIn('id', Competencia_Laboral_Centro::where('centros_id', Auth::user()->centros_id)->get()->pluck('competencias_id'));
+
+        return view('Administrador.Gestion_Ofertas.competencia_laboral.modal_oferta_competencia', compact('oferta_competencia','municipios', 'competencias', 'trimestres', 'editar'));
+
+    }
+
+    public function editar_ofertas_competencia(Request $request)
+    {
+        acceso_a(1,2);
+        $data = $request->all();
+
+        $validator = Validator::make($data, [
+            "trimestre" => "required|numeric",
+            "duracion" => "required|numeric",
+            "fecha_inicio" => "required|string",
+            "fecha_fin" => "required|string",
+            "cupos" => "required|numeric",
+            "municipio" => "required|numeric",
+            "competencia" => "required|numeric",
+        ]);
+
+        if ($validator->fails()) {
+            return ($validator->errors()->all());
+        }
+
+        if ( tiene_rol(1) ) {
+            if ( !isset($data['centro']) || $data['centro'] == "null") {
+                return json_encode(["type"=> "error", "message"=>"El campo CENTRO es obligatorio."]);
+            }
+        }
+
+        $oferta_competencia = Oferta_Competencia_Laboral::find($data['id']);
+                
+        if ($oferta_competencia) {
+            if (!tiene_rol(1) && $oferta_competencia->competencias_centro->centros_id != Auth::user()->centros_id) {
+                return json_encode(["type"=> "error", "message"=>"El usuario no pertenece al CENTRO."]);
+            }
+
+            $competencia_centro = Competencia_Laboral_Centro::where('competencias_id', $data['competencia'])
+                ->where('centros_id', isset($data['centro']) ? $data['centro'] : Auth::user()->centros_id);
+
+            if ($competencia_centro->exists()) {
+                try {
+                    DB::beginTransaction();
+                    $oferta_competencia->trimestres_id = $data['trimestre'];
+                    $oferta_competencia->duracion = $data['duracion'];
+                    $oferta_competencia->fecha_inicio = $data['fecha_inicio'];
+                    $oferta_competencia->fecha_fin = $data['fecha_fin'];
+                    $oferta_competencia->cupos = $data['cupos'];
+                    $oferta_competencia->municipios_id = $data['municipio'];
+                    $oferta_competencia->competencias_laborales_centros_id = $competencia_centro->first()->id;
+                    $oferta_competencia->funcionarios_updated_id = Auth::user()->id;
+    
+                    if($oferta_competencia->save()){
+                        DB::commit();
+                        return json_encode(["type"=> "success", "message"=>"La OFERTA DE LA COMPETENCIA se actualizo correctamente."]);
+                    }else{
+                        DB::rollBack();
+                        return json_encode(["type"=> "error", "message"=>"Error al actualizar la OFERTA DE LA COMPETENCIA."]);
+                    }
+                    
+                } catch (\Throwable $ex) {
+                    DB::rollBack();
+                    return json_encode(["type"=> "error", "message"=>"Error al actualizar la OFERTA DE LA COMPETENCIA."]);
+                }
+            }else{
+
+                try {
+                    DB::beginTransaction();
+                    $new_competencia_centro = new Competencia_Laboral_Centro;                    
+                    $new_competencia_centro->competencias_id = $data['competencia'];
+                    $new_competencia_centro->centros_id = $data['centro'];
+                    
+                    if($new_competencia_centro->save()){
+                        $oferta_competencia->trimestres_id = $data['trimestre'];
+                        $oferta_competencia->duracion = $data['duracion'];
+                        $oferta_competencia->fecha_inicio = $data['fecha_inicio'];
+                        $oferta_competencia->fecha_fin = $data['fecha_fin'];
+                        $oferta_competencia->cupos = $data['cupos'];
+                        $oferta_competencia->municipios_id = $data['municipio'];
+                        $oferta_competencia->competencias_laborales_centros_id = $new_competencia_centro->id;
+                        $oferta_competencia->funcionarios_updated_id = Auth::user()->id;
+        
+                        if($oferta_competencia->save()){
+                            DB::commit();
+                            return json_encode(["type"=> "success", "message"=>"La OFERTA DE LA COMPETENCIA se actualizo correctamente."]);
+                        }else{
+                            DB::rollBack();
+                            return json_encode(["type"=> "error", "message"=>"Error al actualizar la OFERTA DE LA COMPETENCIA."]);
+                        }
+                    }else{
+                        DB::rollBack();    
+                        return json_encode(["type"=> "error", "message"=>"No se ha podido asociar el OFERTA DE LA COMPETENCIA."]);
+                    }
+                } catch (\Throwable $th) {
+                    DB::rollBack();    
+                    return json_encode(["type"=> "error", "message"=>"La OFERTA DE LA COMPETENCIA no ha podido ser creada."]);
+                }
+            }
+            
+        }else{
+            return json_encode(["type"=> "error", "message"=>"No se encontró la OFERTA DE LA COMPETENCIA."]);
+        }    
     }
 
 

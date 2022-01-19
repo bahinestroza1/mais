@@ -24,11 +24,8 @@
                         <td>{{$oferta_competencia->trimestre->numero. "-". $oferta_competencia->trimestre->vigencia . " ( " . $oferta_competencia->trimestre->fecha_inicio ." / " . $oferta_competencia->trimestre->fecha_fin . " )" }}</td>
                         <td>{{$oferta_competencia->competencias_centro->competencia_laboral->mesa_sectorial}}</td>                        
                         <td>
-                            <a id="btn_oferta_competencia_{{$oferta_competencia->id}}" href="#" onclick="cargarModalOfertaCompetencia(0,{{$oferta_competencia->id}})" class="btn btn-success" title="Ver detalle">
-                                <i class="fas fa-eye"></i> Ver
-                            </a>
-                            <a id="btn_oferta_competencia_{{$oferta_competencia->id}}" href="#" onclick="cargarModalOfertaCompetencia(1,{{$oferta_competencia->id}})" class="btn btn-primary" title="Editar">
-                                <i class="fas fa-user-edit"></i> Editar
+                            <a id="btn_ver_oferta_competencia_{{$oferta_competencia->id}}" href="#" onclick="cargarModalVerOfertaCompetencia({{$oferta_competencia->id}})" class="btn btn-primary" title="Ver más">
+                                <i class="fas fa-expand-arrows-alt mr-1"></i> Ver más
                             </a>
                         </td>
                     </tr>
@@ -40,5 +37,5 @@
     {{ $ofertas_competencias->links() }}
 </div>
 @else
-    <p>No se encontraron registros para la busqueda</p>
+    <p>No se encontraron registros para la búsqueda</p>
 @endif

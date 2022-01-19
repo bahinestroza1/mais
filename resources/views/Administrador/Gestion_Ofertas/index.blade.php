@@ -33,11 +33,15 @@ active
     @include('Administrador.Gestion_Ofertas.programas.modal_oferta_programa')
 </div>
 
-{{--
+
 <div id="crear_oferta_competencia_modal_container">
-	@include('Administrador.Gestion_Ofertas.competencia_laboral.modal_crear_oferta_competencias')
+    @include('Administrador.Gestion_Ofertas.competencia_laboral.modal_crear_oferta_competencias')
 </div>
---}}
+
+<div id="oferta_competencia_modal_container">
+    @include('Administrador.Gestion_Ofertas.competencia_laboral.modal_oferta_competencia')
+</div>
+
 
 <div class="container-fluid">
     @if (Session::has('message'))
@@ -75,8 +79,8 @@ active
                             <div class="row">
                                 @if(tiene_rol(1))                                
                                     <div class="col-md-3">
-                                        <label for="filtro_centro">Centro</label>      
-                                        <select id="filtro_centro" name="filtro_centro" class="form-control" value="{{ old('filtro_centro') }}" >
+                                        <label for="filtro_centro_programas">Centro</label>      
+                                        <select id="filtro_centro_programas" name="filtro_centro_programas" class="form-control" value="{{ old('filtro_centro_programas') }}" >
                                             <option value="null">TODOS</option>
                                             @foreach ($centros as $centro)
                                                 <option value="{{$centro->id}}" {{ (old('filtro_centro') === "{$centro->id}") ? 'selected' : '' }}>{{$centro->nombre}}</option>
@@ -86,44 +90,44 @@ active
                                 @endif
                                 
                                 <div class="col-md-2">
-                                    <label for="filtro_nivel_formacion">Nivel de Formación</label>      
-                                    <select id="filtro_nivel_formacion" name="filtro_nivel_formacion" class="form-control">   
+                                    <label for="filtro_nivel_formacion_programas">Nivel de Formación</label>      
+                                    <select id="filtro_nivel_formacion_programas" name="filtro_nivel_formacion_programas" class="form-control">   
                                         <option value="null">TODOS</option>                                        
-                                        <option value="Auxiliar" {{ (old('filtro_nivel_formacion') === "Auxiliar") ? 'selected' : '' }}>Auxiliar</option>
-                                        <option value="Complementario" {{ (old('filtro_nivel_formacion') === "Complementario") ? 'selected' : '' }}>Complementario</option>
-                                        <option value="Especialización Tecnológica" {{ (old('filtro_nivel_formacion') === "Especialización Tecnológica") ? 'selected' : '' }}>Especialización Tecnológica</option>
-                                        <option value="Operario" {{ (old('filtro_nivel_formacion') === "Operario") ? 'selected' : '' }}>Operario</option>
-                                        <option value="Técnico" {{ (old('filtro_nivel_formacion') === "Técnico") ? 'selected' : '' }}>Técnico</option>
-                                        <option value="Tecnólogo" {{ (old('filtro_nivel_formacion') === "Tecnólogo") ? 'selected' : '' }}>Tecnólogo</option>                        
+                                        <option value="Auxiliar" {{ (old('filtro_nivel_formacion_programas') === "Auxiliar") ? 'selected' : '' }}>Auxiliar</option>
+                                        <option value="Complementario" {{ (old('filtro_nivel_formacion_programas') === "Complementario") ? 'selected' : '' }}>Complementario</option>
+                                        <option value="Especialización Tecnológica" {{ (old('filtro_nivel_formacion_programas') === "Especialización Tecnológica") ? 'selected' : '' }}>Especialización Tecnológica</option>
+                                        <option value="Operario" {{ (old('filtro_nivel_formacion_programas') === "Operario") ? 'selected' : '' }}>Operario</option>
+                                        <option value="Técnico" {{ (old('filtro_nivel_formacion_programas') === "Técnico") ? 'selected' : '' }}>Técnico</option>
+                                        <option value="Tecnólogo" {{ (old('filtro_nivel_formacion_programas') === "Tecnólogo") ? 'selected' : '' }}>Tecnólogo</option>                        
                                     </select>                          
                                 </div>
 
                                 <div class="col-md-3">
-                                    <label for="filtro_programa">Programa</label>      
-                                    <select id="filtro_programa" name="filtro_programa" class="form-control"  >
+                                    <label for="filtro_programa_programas">Programa</label>      
+                                    <select id="filtro_programa_programas" name="filtro_programa_programas" class="form-control"  >
                                         <option value="null">TODOS</option>
                                         @foreach ($programas as $programa)
-                                            <option value="{{$programa->id}}" {{ (old('filtro_programa') === "{$programa->id}") ? 'selected' : '' }}>{{$programa->nombre}}</option>
+                                            <option value="{{$programa->id}}" {{ (old('filtro_programa_programas') === "{$programa->id}") ? 'selected' : '' }}>{{$programa->nombre}}</option>
                                         @endforeach
                                     </select>   
                                 </div>
                                 
                                 <div class="col-md-2">
-                                    <label for="filtro_municipio">Municipio</label>      
-                                    <select id="filtro_municipio" name="filtro_municipio" class="form-control"  >
+                                    <label for="filtro_municipio_programas">Municipio</label>      
+                                    <select id="filtro_municipio_programas" name="filtro_municipio_programas" class="form-control"  >
                                         <option value="null">TODOS</option>
                                         @foreach ($municipios as $municipio)
-                                            <option value="{{$municipio->id}}" {{ (old('filtro_municipio') === "{$municipio->id}") ? 'selected' : '' }}>{{$municipio->nombre}}</option>
+                                            <option value="{{$municipio->id}}" {{ (old('filtro_municipio_programas') === "{$municipio->id}") ? 'selected' : '' }}>{{$municipio->nombre}}</option>
                                         @endforeach
                                     </select>   
                                 </div>
 
                                 <div class="col-md-3">
-                                    <label for="filtro_trimestre">Trimestre</label>
-                                    <select id="filtro_trimestre" name="filtro_trimestre" class="form-control"  >
+                                    <label for="filtro_trimestre_programas">Trimestre</label>
+                                    <select id="filtro_trimestre_programas" name="filtro_trimestre_programas" class="form-control"  >
                                         <option value="null">TODOS</option>
                                         @foreach ($trimestres as $trimestre)
-                                            <option value="{{$trimestre->id}}" {{ (old('filtro_trimestre') === "{$trimestre->id}") ? 'selected' : '' }}>
+                                            <option value="{{$trimestre->id}}" {{ (old('filtro_trimestre_programas') === "{$trimestre->id}") ? 'selected' : '' }}>
                                                 {{$trimestre->numero."-".$trimestre->vigencia . " ( " . $trimestre->fecha_inicio ." / " . $trimestre->fecha_fin . " )" }}
                                             </option>
                                         @endforeach
@@ -131,11 +135,11 @@ active
                                 </div> 
                                 
                                 <div class="col-md-2">
-                                    <label for="filtro_modalidad">Modalidad</label>
-                                    <select id="filtro_modalidad" name="filtro_modalidad" class="form-control"  >
+                                    <label for="filtro_modalidad_programas">Modalidad</label>
+                                    <select id="filtro_modalidad_programas" name="filtro_modalidad_programas" class="form-control"  >
                                         <option selected value="null">TODOS</option>
-                                        <option value="PRESENCIAL" {{ (old('filtro_modalidad') === "PRESENCIAL") ? 'selected' : '' }}>PRESENCIAL</option>
-                                        <option value="VIRTUAL" {{ (old('filtro_modalidad') === "VIRTUAL") ? 'selected' : '' }}>VIRTUAL</option>
+                                        <option value="PRESENCIAL" {{ (old('filtro_modalidad_programas') === "PRESENCIAL") ? 'selected' : '' }}>PRESENCIAL</option>
+                                        <option value="VIRTUAL" {{ (old('filtro_modalidad_programas') === "VIRTUAL") ? 'selected' : '' }}>VIRTUAL</option>
                                     </select>
                                 </div>
                                 
@@ -175,7 +179,7 @@ active
         </div>
     </div>
 
-    {{--
+
     <!-- Oferta de Competencias Laborales -->
     <div class="card">
         <div class="card-header bg-dark">
@@ -186,7 +190,7 @@ active
                     <i class="fas fa-minus" style="color: #FFF;"></i></button>
             </div>
         </div>
-        <div class="card-body">
+        <div id="contenedor_oferta_competencia" class="card-body">
             <div class="card">
                 <div class="card-header bg-primary">
                     <h3 class="card-title">{{tiene_rol(1) ? 'Oferta: REGIONAL VALLE' : Auth::user()->centro->nombre }}</h3>
@@ -198,26 +202,27 @@ active
                 </div>
                 <div class="card-body">
                     <div class="container">
-                        <form id="form_filtrar_oferta_competencias" onsubmit="filtrarOfertaCompetencias()" autocomplete="off">
+                        <form id="form_filtrar" onsubmit="filtrarOfertaCompetencias()" autocomplete="off">
+                            <input type="hidden" id="type" name="type" value="1">
                             @csrf
                             <div class="row">
                                 <div class="col-md-3">
                                     <label for="filtro_nombre">Nombre</label>      
-                                    <input name="filtro_nombre" id="filtro_nombre" type="text" class="form-control">
+                                    <input name="filtro_nombre" id="filtro_nombre" type="text" class="form-control" value="{{ old('filtro_nombre') }}">
                                 </div>
 
                                 <div class="col-md-2">
                                     <label for="filtro_codigo_nscl">Código NSCL</label>      
-                                    <input type="number" name="filtro_codigo_nscl" id="filtro_codigo_nscl" class="form-control">                          
+                                    <input type="number" name="filtro_codigo_nscl" id="filtro_codigo_nscl" class="form-control" value="{{ old('filtro_codigo_nscl') }}">                          
                                 </div>
 
                                 @if(tiene_rol(1))                                
                                     <div class="col-md-3">
                                         <label for="filtro_centro">Centro</label>      
                                         <select id="filtro_centro" name="filtro_centro" class="form-control">
-                                            <option selected value="null">TODOS</option>
+                                            <option value="null">TODOS</option>
                                             @foreach ($centros as $centro)
-                                                <option value="{{$centro->id}}">{{$centro->nombre}}</option>
+                                                <option value="{{$centro->id}}" {{ (old('filtro_centro') === "{$centro->id}") ? 'selected' : '' }}>{{$centro->nombre}}</option>
                                             @endforeach
                                         </select>   
                                     </div>
@@ -226,9 +231,9 @@ active
                                 <div class="col-md-2">
                                     <label for="filtro_municipio">Municipio</label>      
                                     <select id="filtro_municipio" name="filtro_municipio" class="form-control">
-                                        <option selected value="null">TODOS</option>
+                                        <option value="null">TODOS</option>
                                         @foreach ($municipios as $municipio)
-                                            <option value="{{$municipio->id}}">{{$municipio->nombre}}</option>
+                                            <option value="{{$municipio->id}}" {{ (old('filtro_municipio') === "{$municipio->id}") ? 'selected' : '' }}>{{$municipio->nombre}}</option>
                                         @endforeach
                                     </select>   
                                 </div>
@@ -236,9 +241,9 @@ active
                                 <div class="col-md-2">
                                     <label for="filtro_trimestre">Trimestre</label>
                                     <select id="filtro_trimestre" name="filtro_trimestre" class="form-control">
-                                        <option selected value="null">TODOS</option>
+                                        <option value="null">TODOS</option>
                                         @foreach ($trimestres as $trimestre)
-                                            <option value="{{$trimestre->id}}">
+                                            <option value="{{$trimestre->id}}" {{ (old('filtro_trimestre') === "{$trimestre->id}") ? 'selected' : '' }}>
                                                 {{$trimestre->numero."-".$trimestre->vigencia . " ( " . $trimestre->fecha_inicio ." / " . $trimestre->fecha_fin . " )" }}
                                             </option>
                                         @endforeach
@@ -263,11 +268,11 @@ active
                 </div>
             </div>   
             @if(isset($ofertas_competencias))
-                <div id="tabla_ofertas_competencias">
+                <div id="tabla">
                     @include('Administrador.Gestion_Ofertas.competencia_laboral.tabla_competencia')
                 </div>
             @endif
         </div>
-    </div> --}}
+    </div> 
 </div>
 @endsection
