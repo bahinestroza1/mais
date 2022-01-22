@@ -135,7 +135,37 @@
                     </li>
                   </ul>
                 </li>
-              @endif                                    
+              @endif    
+              @if(tiene_rol(1,2))
+                <li class="nav-item has-treeview @yield('menu-reportes','')">
+                  <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-cloud-download-alt"></i>
+                    <p>
+                      Reportes
+                      <i class="fas fa-angle-left right"></i>
+                    </p>
+                  </a>
+                
+                <ul class="nav nav-treeview">                  
+                    <li class="nav-item">
+                        <a href="{{route('reporte_usuarios')}}" class="nav-link @yield('menu-reportes-reporte-usuarios','')">
+                          <i class="nav-icon far fa-arrow-alt-circle-down"></i>
+                          <p>
+                              Reporte de Usuarios
+                          </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{route('reporte_ofertas')}}" class="nav-link @yield('menu-reportes-reporte-ofertas','')">
+                          <i class="nav-icon far fa-arrow-alt-circle-down"></i>
+                          <p>
+                              Reporte de Ofertas
+                          </p>
+                        </a>
+                    </li>
+                  </ul>
+                </li>
+              @endif                                
             @endif
         </ul>
       </nav>

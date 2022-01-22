@@ -1757,3 +1757,177 @@ function tomarSolicitud(idSolicitud, idOferta = null, tipoServicio = null) {
         }
     })
 }
+
+
+/**
+ * Reportes
+ */
+
+function mostrarInformacionMunicipio(municipio) {
+    event.preventDefault();
+
+    if ((municipio == null) && ($('#filtro_municipio').val() == "null")) {
+        $('.mapdiv #layer9 path').removeClass('bg-red');
+        $('.contenedor_resultados_reporte_usuarios #usuarios_municipio')
+            .html(`<h3 class="text-center" >Reporte de Usuarios:</h3>
+                <p>A continuación puede descargar la información de todos los usuarios registrados en el sistema.</p>
+                <button id="btn_descargar_reporte_usuarios" class="btn btn-primary w-100" >Descargar Información Completa</button>
+            `);
+        $(`.mapdiv #layer9 path`).addClass('bg-red');
+        return;
+    }
+
+    if (municipio == null) {
+        municipio = $('#filtro_municipio').val();
+    }
+
+    municipio = municipio.replaceAll('_', ' ');
+
+    const url = `${SERVER_URL}reportes/usuarios/municipio`;
+
+    $.ajax({
+        url,
+        method: "GET",
+        data: {
+            municipio
+        },
+        datatype: "json"
+
+    }).done(response => {
+        $('.mapdiv #layer9 path').removeClass('bg-red');
+        const data = JSON.parse(response);
+
+        if (data.type == "error") {
+            swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                confirmButtonText: 'Aceptar',
+                text: data.message
+            });
+        }
+
+        $('.contenedor_resultados_reporte_usuarios #usuarios_municipio')
+            .html(`<h3 class="text-center">Usuarios pertenecientes al municipio: ${municipio}</h3>`);
+
+        const idMunicipio = municipio.replaceAll(' ', '_');
+        $('#filtro_municipio').val(idMunicipio);
+        $(`.mapdiv #${idMunicipio}`).addClass('bg-red');
+
+        if (data.users.length > 0) {
+            data.users.forEach(item => {
+                $('.contenedor_resultados_reporte_usuarios #usuarios_municipio')
+                    .append(`<p><span class="font-weight-bold">${item.cargo}</span> - ${item.nombre} ${item.apellido}</p>`);
+            });
+
+            $('.contenedor_resultados_reporte_usuarios #usuarios_municipio')
+                .append(`<button id="btn_descargar_reporte_usuarios" class="btn btn-primary w-100" >Descargar Información Completa</button>`);
+        } else {
+            $('.contenedor_resultados_reporte_usuarios #usuarios_municipio')
+                .append(`<p>Sin usuarios registrados</p>`);
+        }
+
+    }).fail(function (jqXHR, textStatus) {
+        console.log(jqXHR);
+        console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);
+    });
+}
+
+function mostrarInformacionOfertaMunicipio(municipio) {
+    event.preventDefault();
+
+    if ((municipio == null) && ($('#filtro_municipio').val() == "null")) {
+        $('.mapdiv #layer9 path').removeClass('bg-red');
+        $('.contenedor_resultados_reporte_ofertas #ofertas_municipio')
+            .html(`<h3 class="text-center" >Reporte de Ofertas:</h3>
+                <p>A continuación puede descargar la información de las ofertas registradas en el sistema.</p>
+                <button id="btn_descargar_reporte_ofertas" class="btn btn-primary w-100" >Descargar Información Completa</button>
+            `);
+        $(`.mapdiv #layer9 path`).addClass('bg-red');
+        return;
+    }
+
+    if (municipio == null) {
+        municipio = $('#filtro_municipio').val();
+    }
+
+    municipio = municipio.replaceAll('_', ' ');
+
+    const url = `${SERVER_URL}reportes/ofertas/municipio`;
+
+    $.ajax({
+        url,
+        method: "GET",
+        data: {
+            municipio
+        },
+        datatype: "json"
+
+    }).done(response => {
+        $('.mapdiv #layer9 path').removeClass('bg-red');
+        const data = JSON.parse(response);
+
+        if (data.type == "error") {
+            swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                confirmButtonText: 'Aceptar',
+                text: data.message
+            });
+        }
+
+        $('.contenedor_resultados_reporte_ofertas #ofertas_municipio')
+            .html(`<h3 class="text-center mb-3">Oferta perteneciente al municipio: ${municipio}</h3>`);
+
+        const idMunicipio = municipio.replaceAll(' ', '_');
+        $('#filtro_municipio').val(idMunicipio);
+        $(`.mapdiv #${idMunicipio}`).addClass('bg-red');
+
+        // Carga de ofertas de formación
+        $('.contenedor_resultados_reporte_ofertas #ofertas_municipio')
+            .append(`<h6 class="text-center font-weight-bold">Últimas ofertas de Programas de Formación</h6>
+            <div id="contenedor_ofertas_programas"></div> `);
+
+        if (data.ofertas_programas.length > 0) {
+            for (let index = 0; index < 2; index++) {
+                if (index < data.ofertas_programas.length) {
+                    $('#contenedor_ofertas_programas')
+                        .append(`<p><span class="font-weight-bold">Centro: </span>${data.ofertas_programas[index].centro} <br> <span class="font-weight-bold">Programa: </span>${data.ofertas_programas[index].programa} <br> <span class="font-weight-bold">Cupos: </span>${data.ofertas_programas[index].cupos}</p>`);
+                }
+            }
+
+            $('#contenedor_ofertas_programas')
+                .append(`<p class="text-center"> Mostrando 2 de ... <span class="font-weight-bold">${data.ofertas_programas.length}</span> ofertas</p> <hr/>`);
+        } else {
+            $('#contenedor_ofertas_programas')
+                .append(`<p class="text-center">Sin ofertas de programas de formación registradas</p>`);
+        }
+
+        // Carga de ofertas de competencia
+        $('.contenedor_resultados_reporte_ofertas #ofertas_municipio')
+            .append(`<h6 class="text-center font-weight-bold">Últimas oferta de Competencias Laborales</h6>
+            <div id="contenedor_ofertas_competencias"></div> `);
+
+        if (data.ofertas_competencias.length > 0) {
+            for (let index = 0; index < 2; index++) {
+                if (index < data.ofertas_competencias.length) {
+                    $('#contenedor_ofertas_competencias')
+                        .append(`<p><span class="font-weight-bold">Centro: </span>${data.ofertas_competencias[index].centro} <br> <span class="font-weight-bold">Competencia: </span>${data.ofertas_competencias[index].competencia} <br> <span class="font-weight-bold">Cupos: </span>${data.ofertas_competencias[index].cupos}</p>`);
+                }
+            }
+            $('#contenedor_ofertas_competencias')
+                .append(`<p class="text-center"> Mostrando 2 de ... <span class="font-weight-bold">${data.ofertas_competencias.length}</span> ofertas</p>`);
+        } else {
+            $('#contenedor_ofertas_competencias')
+                .append(`<p class="text-center">Sin ofertas de competencia laboral registradas</p>`);
+        }
+
+        if (data.ofertas_programas.length > 0 || data.ofertas_competencias.length > 0) {
+            $('.contenedor_resultados_reporte_ofertas #ofertas_municipio')
+                .append(`<button id="btn_descargar_reporte_ofertas" class="btn btn-primary w-100" >Descargar Información Completa</button>`);
+        }
+
+    }).fail(function (jqXHR, textStatus) {
+        console.log(jqXHR);
+        console.log(textStatus + ": " + jqXHR.status + " - " + jqXHR.statusText);
+    });
+}

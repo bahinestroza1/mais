@@ -14,6 +14,7 @@
 use App\Http\Controllers\AdministradorController;
 use App\Http\Controllers\DescargasController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ReportesController;
 use App\Http\Controllers\ServiciosController;
 
 Route::get('/', function () {
@@ -113,4 +114,13 @@ Route::get('/servicios/solicitudes/crear', [ServiciosController::class, 'crear_s
 Route::post('/servicios/solicitudes/crear', [ServiciosController::class, 'crear_solicitudes'])->name('crear_solicitudes');
 
 
+/**
+ * RUTAS REFERENTES A LOS REPORTES
+ */
+Route::get('/reportes/usuarios', [ReportesController::class, 'reporte_usuarios'])->name('reporte_usuarios');
+Route::get('/reportes/usuarios/municipio', [ReportesController::class, 'reporte_usuarios_municipio'])->name('reporte_usuarios_municipio');
+Route::post('/reportes/usuarios/municipio', [ReportesController::class, 'descargar_reporte_usuarios_municipio'])->name('descargar_reporte_usuarios_municipio');
 
+Route::get('/reportes/ofertas', [ReportesController::class, 'reporte_ofertas'])->name('reporte_ofertas');
+Route::get('/reportes/ofertas/municipio', [ReportesController::class, 'reporte_ofertas_municipio'])->name('reporte_ofertas_municipio');
+Route::post('/reportes/ofertas/municipio', [ReportesController::class, 'descargar_reporte_ofertas_municipio'])->name('descargar_reporte_ofertas_municipio');

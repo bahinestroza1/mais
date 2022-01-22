@@ -12,8 +12,8 @@ class Municipio extends Model
         "nombre", "codigo", "id"
     ];
 
-    public function usuario()
+    public function usuarios()
     {
-        return $this->hasMany(User::class, 'municipio_id', 'id');
+        return $this->hasMany(User::class, 'municipios_id', 'id');
     }
 }
